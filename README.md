@@ -6,7 +6,7 @@ EIP-1559 command line tools
 [![oclif](https://img.shields.io/badge/cli-oclif-brightgreen.svg)](https://oclif.io)
 [![Version](https://img.shields.io/npm/v/eip1559.svg)](https://npmjs.org/package/eip1559)
 [![Downloads/week](https://img.shields.io/npm/dw/eip1559.svg)](https://npmjs.org/package/eip1559)
-[![License](https://img.shields.io/npm/l/eip1559.svg)](https://github.com/abdelhamidbakhta/eip1559/blob/master/package.json)
+[![License](https://img.shields.io/npm/l/eip1559.svg)](https://github.com/abdelhamidbakhta/eip1559/blob/main/package.json)
 
 <!-- toc -->
 
