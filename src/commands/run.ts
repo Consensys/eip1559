@@ -1,10 +1,13 @@
 import {Command, flags} from '@oclif/command'
-import {Client, ConfigTemplates, DefaultConfig, EIP1559Config, Network} from '../config'
+import {ChainIds, Client, ConfigTemplates, DefaultConfig, EIP1559Config, Network} from '../config'
 import Errors from '../errors'
 import * as fs from 'fs'
-
+import cli from 'cli-ux'
+const logSymbols = require('log-symbols')
+const ejs = require('ejs')
 const download = require('download')
 const rimraf = require('rimraf')
+
 
 export default class Run extends Command {
   static description = 'Run an EIP-1559 capable Ethereum node on the specified network'
@@ -22,7 +25,8 @@ export default class Run extends Command {
   async run() {
     this.eip1559Config = this.parseCommand()
     const configTemplates = await this.downloadConfigTemplateFiles()
-    console.log(configTemplates)
+    await this.renderTemplates(configTemplates)
+    await this.removeTemplates(configTemplates)
   }
 
   private parseCommand(): EIP1559Config {
@@ -59,9 +63,62 @@ export default class Run extends Command {
       this.eip1559Config.workDir,
       this.eip1559Config.client.toLowerCase(),
     )
-    fs.writeFileSync(configTemplates.configLocalTemplatePath, await download(configTemplates.configURL))
-    fs.writeFileSync(configTemplates.genesisLocalTemplatePath, await download(configTemplates.genesisURL))
-
+    try {
+      cli.action.start('Downloading config file template')
+      fs.writeFileSync(configTemplates.configLocalTemplatePath, await download(configTemplates.configURL))
+      cli.action.stop(logSymbols.success)
+    } catch (error) {
+      cli.action.stop(logSymbols.error)
+      return Promise.reject(error)
+    }
+    try {
+      cli.action.start('Downloading genesis file template')
+      fs.writeFileSync(configTemplates.genesisLocalTemplatePath, await download(configTemplates.genesisURL))
+      cli.action.stop(logSymbols.success)
+    } catch (error) {
+      cli.action.stop(logSymbols.error)
+      return Promise.reject(error)
+    }
     return configTemplates
+  }
+
+  async renderTemplates(configTemplates: ConfigTemplates): Promise<void> {
+    try {
+      cli.action.start('Rendering config file template')
+      const configFileStr = fs.readFileSync(configTemplates.configLocalTemplatePath, 'utf-8')
+      const renderedConfig = ejs.render(configFileStr, {
+        rootDir: this.eip1559Config.clientWorkDir,
+      })
+      fs.writeFileSync(configTemplates.configLocalPath, renderedConfig)
+      cli.action.stop(logSymbols.success)
+    } catch (error) {
+      cli.action.stop(logSymbols.error)
+      return Promise.reject(error)
+    }
+    try {
+      cli.action.start('Rendering genesis file template')
+      const genesisFileStr = fs.readFileSync(configTemplates.genesisLocalTemplatePath, 'utf-8')
+      const renderedGenesis = ejs.render(genesisFileStr, {
+        rootDir: this.eip1559Config.clientWorkDir,
+        chainId: ChainIds.get(this.eip1559Config.network),
+      })
+      fs.writeFileSync(configTemplates.genesisLocalPath, renderedGenesis)
+      cli.action.stop(logSymbols.success)
+    } catch (error) {
+      cli.action.stop(logSymbols.error)
+      return Promise.reject(error)
+    }
+  }
+
+  async removeTemplates(configTemplates: ConfigTemplates): Promise<void> {
+    try {
+      cli.action.start('Removing template files')
+      fs.unlinkSync(configTemplates.genesisLocalTemplatePath)
+      fs.unlinkSync(configTemplates.configLocalTemplatePath)
+      cli.action.stop(logSymbols.success)
+    } catch (error) {
+      cli.action.stop(logSymbols.error)
+      return Promise.reject(error)
+    }
   }
 }

@@ -6,6 +6,10 @@ export enum Network {
   RHODES = 'RHODES',
 }
 
+export const ChainIds = new Map<string, number>([
+  [Network.RHODES, 280],
+])
+
 export class DefaultConfig {
   static readonly client = Client.BESU
 
