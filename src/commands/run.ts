@@ -1,5 +1,5 @@
 import {Command, flags} from '@oclif/command'
-import {ChainIds, Client, ConfigTemplates, DefaultConfig, EIP1559Config, Network} from '../config'
+import {ChainIds, Client, ConfigTemplates, DefaultConfig, EIP1559Config, Network, StaticNodes} from '../config'
 import Errors from '../errors'
 import * as fs from 'fs'
 import cli from 'cli-ux'
@@ -7,7 +7,6 @@ const logSymbols = require('log-symbols')
 const ejs = require('ejs')
 const download = require('download')
 const rimraf = require('rimraf')
-
 
 export default class Run extends Command {
   static description = 'Run an EIP-1559 capable Ethereum node on the specified network'
@@ -27,6 +26,7 @@ export default class Run extends Command {
     const configTemplates = await this.downloadConfigTemplateFiles()
     await this.renderTemplates(configTemplates)
     await this.removeTemplates(configTemplates)
+    await this.writeStaticNodesFiles(configTemplates)
   }
 
   private parseCommand(): EIP1559Config {
@@ -56,6 +56,7 @@ export default class Run extends Command {
       rimraf.sync(this.eip1559Config.clientWorkDir)
     }
     fs.mkdirSync(this.eip1559Config.clientWorkDir, {recursive: true})
+    fs.mkdirSync(this.eip1559Config.dataPath, {recursive: true})
 
     const configTemplates = new ConfigTemplates(
       genesisURL,
@@ -115,6 +116,17 @@ export default class Run extends Command {
       cli.action.start('Removing template files')
       fs.unlinkSync(configTemplates.genesisLocalTemplatePath)
       fs.unlinkSync(configTemplates.configLocalTemplatePath)
+      cli.action.stop(logSymbols.success)
+    } catch (error) {
+      cli.action.stop(logSymbols.error)
+      return Promise.reject(error)
+    }
+  }
+
+  async writeStaticNodesFiles(configTemplates: ConfigTemplates): Promise<void> {
+    try {
+      cli.action.start('Generating static nodes file')
+      fs.writeFileSync(configTemplates.staticNodesPath, JSON.stringify(StaticNodes.get(this.eip1559Config.network), null, 2))
       cli.action.stop(logSymbols.success)
     } catch (error) {
       cli.action.stop(logSymbols.error)

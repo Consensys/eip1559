@@ -10,6 +10,14 @@ export const ChainIds = new Map<string, number>([
   [Network.RHODES, 280],
 ])
 
+export const StaticNodes = new Map<string, string[]>([
+  [Network.RHODES, [
+    'enode://0c72e2b7873e4342d725b5990c17adb2b159aad2ff5853de7e4910b25522a1f9e78f9cd802a8a3225b8fae4e994e522b50d6bd5a163eb3a7b49a0a73ca9a1c7e@3.16.76.137:30303',
+    'enode://1c6d296749018e4e4a78baf9a8a3048aae2557c3f2f11a340570d57e71071e2e9816a5f5d9215a333d12b432a81ff5017520b09461c4a102e72c7a1a2d9d7d0f@3.136.236.37:30303',
+    'enode://3eca270e124b5e24e846bb39d0a911d152cfd2671be079478e72e768363c959852301b40b2afffddbe45a285fd752fa4541e8376f73dad688757e0a07a35e164@3.129.247.126:30303',
+  ]],
+])
+
 export class DefaultConfig {
   static readonly client = Client.BESU
 
@@ -29,9 +37,12 @@ export class EIP1559Config {
 
   private readonly _clientWorkDir: string
 
+  private readonly _dataPath: string
+
   constructor(init?: Partial<EIP1559Config>) {
     Object.assign(this, init)
     this._clientWorkDir = `${this.workDir}/config/${this.client.toLowerCase()}`
+    this._dataPath = `${this.workDir}/config/${this.client.toLowerCase()}/data`
   }
 
   get client(): string {
@@ -48,6 +59,10 @@ export class EIP1559Config {
 
   get clientWorkDir(): string {
     return this._clientWorkDir
+  }
+
+  get dataPath(): string {
+    return this._dataPath
   }
 }
 
@@ -66,6 +81,8 @@ export class ConfigTemplates {
 
   private readonly _workDir: string
 
+  private readonly _staticNodesPath: string
+
   constructor(genesisURL: string, configURL: string, workDir: string, client: string) {
     this._genesisURL = genesisURL
     this._configURL = configURL
@@ -74,6 +91,7 @@ export class ConfigTemplates {
     this._genesisLocalPath = `${workDir}/config/${client}/genesis.json`
     this._configLocalTemplatePath = `${workDir}/config/${client}/config.toml.template`
     this._configLocalPath = `${workDir}/config/${client}/config.toml`
+    this._staticNodesPath = `${workDir}/config/${client}/data/static-nodes.json`
   }
 
   get genesisURL(): string {
@@ -102,5 +120,9 @@ export class ConfigTemplates {
 
   get configLocalTemplatePath(): string {
     return this._configLocalTemplatePath
+  }
+
+  get staticNodesPath(): string {
+    return this._staticNodesPath
   }
 }
