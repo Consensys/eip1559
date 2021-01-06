@@ -65,7 +65,7 @@ OPTIONS
   -f, --force
   -h, --help             show CLI help
   -n, --network=network  [default: RHODES] network to use
-  -w, --workDir=workDir  [default: $HOME/.eip1559] working directory
+  -w, --workDir=workDir  [default: /Users/abdelhamid/.eip1559] working directory
 ```
 
 _See code: [src/commands/run.ts](https://github.com/abdelhamidbakhta/eip1559/blob/v0.0.1/src/commands/run.ts)_
