@@ -33,6 +33,7 @@ USAGE
 
 <!-- commands -->
 * [`eip1559 help [COMMAND]`](#eip1559-help-command)
+* [`eip1559 install:besu`](#eip1559-installbesu)
 * [`eip1559 run`](#eip1559-run)
 
 ## `eip1559 help [COMMAND]`
@@ -51,6 +52,22 @@ OPTIONS
 ```
 
 _See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.2.1/src/commands/help.ts)_
+
+## `eip1559 install:besu`
+
+describe the command here
+
+```
+USAGE
+  $ eip1559 install:besu
+
+OPTIONS
+  -h, --help             show CLI help
+  -p, --path=path        [default: /Users/abdelhamid/.eip1559/install/besu] install path
+  -v, --version=version  [default: 20.10.3] version of Besu to install
+```
+
+_See code: [src/commands/install/besu.ts](https://github.com/abdelhamidbakhta/eip1559/blob/v0.0.2/src/commands/install/besu.ts)_
 
 ## `eip1559 run`
 
