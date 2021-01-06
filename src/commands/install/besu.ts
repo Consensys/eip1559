@@ -3,6 +3,7 @@ import * as os from 'os'
 import * as fs from 'fs'
 const download = require('download')
 const rimraf = require('rimraf')
+const unzipper = require('unzipper')
 
 class BesuInstallConfiguration {
   static readonly rootDownloadURL = 'https://dl.bintray.com/hyperledger-org/besu-repo'
@@ -59,6 +60,7 @@ export default class InstallBesu extends Command {
 
     const cfg = new BesuInstallConfiguration(flags.version, flags.path)
     await this.downloadBesuArchive(cfg)
+    await this.extractArchive(cfg)
   }
 
   async downloadBesuArchive(cfg: BesuInstallConfiguration): Promise<void> {
@@ -67,5 +69,11 @@ export default class InstallBesu extends Command {
     }
     fs.mkdirSync(cfg.installRootPath, {recursive: true})
     fs.writeFileSync(cfg.archiveLocalPath, await download(cfg.archiveURL))
+  }
+
+  async extractArchive(cfg: BesuInstallConfiguration): Promise<void> {
+    fs.createReadStream(cfg.archiveLocalPath)
+    // eslint-disable-next-line new-cap
+    .pipe(unzipper.Extract({path: cfg.installRootPath}))
   }
 }
