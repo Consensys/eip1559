@@ -3,10 +3,14 @@ import {ChainIds, Client, ConfigTemplates, DefaultConfig, EIP1559Config, Network
 import Errors from '../errors'
 import * as fs from 'fs'
 import cli from 'cli-ux'
+
 const logSymbols = require('log-symbols')
 const ejs = require('ejs')
 const download = require('download')
 const rimraf = require('rimraf')
+const chalk = require('chalk')
+const publicIp = require('public-ip')
+const shell = require('shelljs')
 
 export default class Run extends Command {
   static description = 'Run an EIP-1559 capable Ethereum node on the specified network'
@@ -26,7 +30,8 @@ export default class Run extends Command {
     const configTemplates = await this.downloadConfigTemplateFiles()
     await this.renderTemplates(configTemplates)
     await this.removeTemplates(configTemplates)
-    await this.writeStaticNodesFiles(configTemplates)
+    this.writeStaticNodesFiles(configTemplates)
+    this.printClientRunCommand(configTemplates)
   }
 
   private parseCommand(): EIP1559Config {
@@ -89,6 +94,7 @@ export default class Run extends Command {
       const configFileStr = fs.readFileSync(configTemplates.configLocalTemplatePath, 'utf-8')
       const renderedConfig = ejs.render(configFileStr, {
         rootDir: this.eip1559Config.clientWorkDir,
+        p2pHost: await publicIp.v4(),
       })
       fs.writeFileSync(configTemplates.configLocalPath, renderedConfig)
       cli.action.stop(logSymbols.success)
@@ -123,14 +129,33 @@ export default class Run extends Command {
     }
   }
 
-  async writeStaticNodesFiles(configTemplates: ConfigTemplates): Promise<void> {
+  writeStaticNodesFiles(configTemplates: ConfigTemplates): void {
     try {
       cli.action.start('Generating static nodes file')
       fs.writeFileSync(configTemplates.staticNodesPath, JSON.stringify(StaticNodes.get(this.eip1559Config.network), null, 2))
       cli.action.stop(logSymbols.success)
     } catch (error) {
       cli.action.stop(logSymbols.error)
-      return Promise.reject(error)
+      this.error(error, {exit: (Errors.STATIC_NODES_FILE_GENERATION_ERROR)})
+    }
+  }
+
+  printClientRunCommand(configTemplates: ConfigTemplates): void {
+    if (this.eip1559Config.client === Client.BESU) {
+      this.printBesuRunCommand(configTemplates)
+    }
+  }
+
+  async printBesuRunCommand(configTemplates: ConfigTemplates): Promise<void> {
+    this.log(
+      chalk`
+      Configuration files are ready. You can now run:
+      {green besu} --config-file={yellow ${configTemplates.configLocalPath}}
+      `,
+    )
+    const runNow = await cli.prompt('Do you want to run it now? Y/n', {required: false}) as string
+    if(runNow === '' || runNow === 'y'  || runNow === 'Y' || runNow === 'yes' || runNow === 'YES'){
+      shell.exec(`besu --config-file=${configTemplates.configLocalPath}`)
     }
   }
 }

@@ -60,11 +60,14 @@
     "@oclif/config": "^1.17.0",
     "@oclif/plugin-help": "^3.2.1",
     "@oclif/plugin-not-found": "^1.2.4",
+    "chalk": "^2.4.2",
     "cli-ux": "^5.5.1",
     "download": "^8.0.0",
     "ejs": "^3.1.5",
     "log-symbols": "^4.0.0",
+    "public-ip": "^4.0.3",
     "rimraf": "^2.6.3",
+    "shelljs": "^0.8.4",
     "tslib": "^1.14.1"
   }
 }
