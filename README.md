@@ -21,7 +21,7 @@ $ npm install -g eip1559
 $ eip1559 COMMAND
 running command...
 $ eip1559 (-v|--version|version)
-eip1559/0.0.1 darwin-x64 node-v15.3.0
+eip1559/0.0.2 darwin-x64 node-v15.3.0
 $ eip1559 --help [COMMAND]
 USAGE
   $ eip1559 COMMAND
@@ -62,11 +62,12 @@ USAGE
 
 OPTIONS
   -c, --client=client    [default: BESU] ethereum client
+  -e, --ethStatsEnabled  enable eth stats
   -f, --force
   -h, --help             show CLI help
   -n, --network=network  [default: RHODES] network to use
   -w, --workDir=workDir  [default: /Users/abdelhamid/.eip1559] working directory
 ```
 
-_See code: [src/commands/run.ts](https://github.com/abdelhamidbakhta/eip1559/blob/v0.0.1/src/commands/run.ts)_
+_See code: [src/commands/run.ts](https://github.com/abdelhamidbakhta/eip1559/blob/v0.0.2/src/commands/run.ts)_
 <!-- commandsstop -->

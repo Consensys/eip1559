@@ -18,12 +18,37 @@ export const StaticNodes = new Map<string, string[]>([
   ]],
 ])
 
+export class EthStatsCredentials {
+  private readonly _endpoint: string
+
+  private readonly _password: string
+
+  constructor(endpoint: string, password: string) {
+    this._endpoint = endpoint
+    this._password = password
+  }
+
+  get endpoint(): string {
+    return this._endpoint
+  }
+
+  get password(): string {
+    return this._password
+  }
+}
+
+export const EthStatsData = new Map<string, EthStatsCredentials>([
+  [Network.RHODES, new EthStatsCredentials('3.21.227.120:3001', '7pyzQMYIWkrPZ7ab')],
+])
+
 export class DefaultConfig {
   static readonly client = Client.BESU
 
   static readonly network = Network.RHODES
 
   static readonly workDir = `${require('os').homedir()}/.eip1559`
+
+  static readonly ethStatsEnabled = true
 
   static readonly configRepo = 'ConsenSys/eip1559-rhodes'
 }
@@ -34,6 +59,8 @@ export class EIP1559Config {
   public readonly _network: string = DefaultConfig.network
 
   public readonly _workDir: string = DefaultConfig.workDir
+
+  public readonly _ethStatsEnabled: boolean = DefaultConfig.ethStatsEnabled
 
   private readonly _clientWorkDir: string
 
@@ -63,6 +90,10 @@ export class EIP1559Config {
 
   get dataPath(): string {
     return this._dataPath
+  }
+
+  get ethStatsEnabled(): boolean {
+    return this._ethStatsEnabled
   }
 }
 

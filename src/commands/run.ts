@@ -1,5 +1,14 @@
 import {Command, flags} from '@oclif/command'
-import {ChainIds, Client, ConfigTemplates, DefaultConfig, EIP1559Config, Network, StaticNodes} from '../config'
+import {
+  ChainIds,
+  Client,
+  ConfigTemplates,
+  DefaultConfig,
+  EIP1559Config, EthStatsCredentials,
+  EthStatsData,
+  Network,
+  StaticNodes,
+} from '../config'
 import Errors from '../errors'
 import * as fs from 'fs'
 import cli from 'cli-ux'
@@ -12,6 +21,8 @@ const chalk = require('chalk')
 const publicIp = require('public-ip')
 const shell = require('shelljs')
 
+const slowDown = true
+
 export default class Run extends Command {
   static description = 'Run an EIP-1559 capable Ethereum node on the specified network'
 
@@ -22,6 +33,7 @@ export default class Run extends Command {
     network: flags.string({char: 'n', description: 'network to use', default: DefaultConfig.network}),
     client: flags.string({char: 'c', description: 'ethereum client', default: DefaultConfig.client}),
     workDir: flags.string({char: 'w', description: 'working directory', default: DefaultConfig.workDir}),
+    ethStatsEnabled: flags.boolean({char: 'e', description: 'enable eth stats', default: true}),
     force: flags.boolean({char: 'f'}),
   }
 
@@ -30,8 +42,8 @@ export default class Run extends Command {
     const configTemplates = await this.downloadConfigTemplateFiles()
     await this.renderTemplates(configTemplates)
     await this.removeTemplates(configTemplates)
-    this.writeStaticNodesFiles(configTemplates)
-    this.printClientRunCommand(configTemplates)
+    await this.writeStaticNodesFiles(configTemplates)
+    await this.printClientRunCommand(configTemplates)
   }
 
   private parseCommand(): EIP1559Config {
@@ -48,6 +60,7 @@ export default class Run extends Command {
         _client: flags.client,
         _network: flags.network,
         _workDir: flags.workDir,
+        _ethStatsEnabled: flags.ethStatsEnabled,
       },
     )
   }
@@ -70,15 +83,11 @@ export default class Run extends Command {
       this.eip1559Config.client.toLowerCase(),
     )
     try {
-      cli.action.start('Downloading config file template')
+      cli.action.start('Downloading config file templates')
+      if (slowDown) {
+        await cli.wait(750)
+      }
       fs.writeFileSync(configTemplates.configLocalTemplatePath, await download(configTemplates.configURL))
-      cli.action.stop(logSymbols.success)
-    } catch (error) {
-      cli.action.stop(logSymbols.error)
-      return Promise.reject(error)
-    }
-    try {
-      cli.action.start('Downloading genesis file template')
       fs.writeFileSync(configTemplates.genesisLocalTemplatePath, await download(configTemplates.genesisURL))
       cli.action.stop(logSymbols.success)
     } catch (error) {
@@ -90,20 +99,19 @@ export default class Run extends Command {
 
   async renderTemplates(configTemplates: ConfigTemplates): Promise<void> {
     try {
-      cli.action.start('Rendering config file template')
+      cli.action.start('Rendering config file templates')
+      if (slowDown) {
+        await cli.wait(750)
+      }
       const configFileStr = fs.readFileSync(configTemplates.configLocalTemplatePath, 'utf-8')
-      const renderedConfig = ejs.render(configFileStr, {
+      const templateData = {
         rootDir: this.eip1559Config.clientWorkDir,
         p2pHost: await publicIp.v4(),
-      })
+        ethStatsEnabled: this.eip1559Config.ethStatsEnabled,
+        ethStatsURL: await this.generateEthStatsURL(),
+      }
+      const renderedConfig = ejs.render(configFileStr, templateData)
       fs.writeFileSync(configTemplates.configLocalPath, renderedConfig)
-      cli.action.stop(logSymbols.success)
-    } catch (error) {
-      cli.action.stop(logSymbols.error)
-      return Promise.reject(error)
-    }
-    try {
-      cli.action.start('Rendering genesis file template')
       const genesisFileStr = fs.readFileSync(configTemplates.genesisLocalTemplatePath, 'utf-8')
       const renderedGenesis = ejs.render(genesisFileStr, {
         rootDir: this.eip1559Config.clientWorkDir,
@@ -120,6 +128,9 @@ export default class Run extends Command {
   async removeTemplates(configTemplates: ConfigTemplates): Promise<void> {
     try {
       cli.action.start('Removing template files')
+      if (slowDown) {
+        await cli.wait(750)
+      }
       fs.unlinkSync(configTemplates.genesisLocalTemplatePath)
       fs.unlinkSync(configTemplates.configLocalTemplatePath)
       cli.action.stop(logSymbols.success)
@@ -140,9 +151,9 @@ export default class Run extends Command {
     }
   }
 
-  printClientRunCommand(configTemplates: ConfigTemplates): void {
+  async printClientRunCommand(configTemplates: ConfigTemplates): Promise<void> {
     if (this.eip1559Config.client === Client.BESU) {
-      this.printBesuRunCommand(configTemplates)
+      await this.printBesuRunCommand(configTemplates)
     }
   }
 
@@ -157,5 +168,15 @@ export default class Run extends Command {
     if (runNow === '' || runNow === 'y'  || runNow === 'Y' || runNow === 'yes' || runNow === 'YES') {
       shell.exec(`besu --config-file=${configTemplates.configLocalPath}`)
     }
+  }
+
+  async generateEthStatsURL(): Promise<string> {
+    const name = `${this.eip1559Config.network.toLowerCase()}-${this.eip1559Config.client.toLowerCase()}-${new Date().getTime()}`
+    const ethStatsCredentials: EthStatsCredentials|undefined = EthStatsData.get(this.eip1559Config.network)
+    if (ethStatsCredentials === undefined) {
+      return Promise.reject(new Error('cannot retrieve ethstats credentials for specified network'))
+    }
+    const credentials: EthStatsCredentials = ethStatsCredentials as EthStatsCredentials
+    return `${name}:${credentials.password}@${credentials.endpoint}`
   }
 }

@@ -1,7 +1,7 @@
 {
   "name": "eip1559",
   "description": "EIP-1559 command line tools",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "Abdelhamid Bakhta @abdelhamidbakhta",
   "bin": {
     "eip1559": "bin/run"
@@ -61,6 +61,7 @@
     "@oclif/plugin-help": "^3.2.1",
     "@oclif/plugin-not-found": "^1.2.4",
     "chalk": "^2.4.2",
+    "cli-progress": "^3.8.2",
     "cli-ux": "^5.5.1",
     "download": "^8.0.0",
     "ejs": "^3.1.5",
