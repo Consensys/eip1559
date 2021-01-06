@@ -154,7 +154,7 @@ export default class Run extends Command {
       `,
     )
     const runNow = await cli.prompt('Do you want to run it now? Y/n', {required: false}) as string
-    if(runNow === '' || runNow === 'y'  || runNow === 'Y' || runNow === 'yes' || runNow === 'YES'){
+    if (runNow === '' || runNow === 'y'  || runNow === 'Y' || runNow === 'yes' || runNow === 'YES') {
       shell.exec(`besu --config-file=${configTemplates.configLocalPath}`)
     }
   }
