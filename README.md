@@ -9,16 +9,13 @@ EIP-1559 command line tools
 [![License](https://img.shields.io/npm/l/eip1559.svg)](https://github.com/abdelhamidbakhta/eip1559/blob/main/package.json)
 
 <!-- toc -->
-
 * [Usage](#usage)
 * [Commands](#commands)
-
 <!-- tocstop -->
 
 # Usage
 
 <!-- usage -->
-
 ```sh-session
 $ npm install -g eip1559
 $ eip1559 COMMAND
@@ -30,13 +27,11 @@ USAGE
   $ eip1559 COMMAND
 ...
 ```
-
 <!-- usagestop -->
 
 # Commands
 
 <!-- commands -->
-
 * [`eip1559 help [COMMAND]`](#eip1559-help-command)
 * [`eip1559 run`](#eip1559-run)
 
@@ -70,6 +65,7 @@ OPTIONS
   -f, --force
   -h, --help             show CLI help
   -n, --network=network  [default: RHODES] network to use
+  -w, --workDir=workDir  [default: $HOME/.eip1559] working directory
 ```
 
 _See code: [src/commands/run.ts](https://github.com/abdelhamidbakhta/eip1559/blob/v0.0.1/src/commands/run.ts)_
