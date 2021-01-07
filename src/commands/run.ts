@@ -5,7 +5,7 @@ import {
   ConfigTemplates,
   DefaultConfig,
   EIP1559Config, EthStatsCredentials,
-  EthStatsData,
+  EthStatsData, EthStatsURLS,
   Network,
   StaticNodes,
 } from '../config'
@@ -21,6 +21,7 @@ const rimraf = require('rimraf')
 const chalk = require('chalk')
 const publicIp = require('public-ip')
 const shell = require('shelljs')
+const open = require('open')
 
 const slowDown = true
 
@@ -175,6 +176,15 @@ export default class Run extends Command {
     )
     const runNow = await cli.prompt('Do you want to run it now? Y/n', {required: false}) as string
     if (runNow === '' || runNow === 'y'  || runNow === 'Y' || runNow === 'yes' || runNow === 'YES') {
+      const ethStatsURL = EthStatsURLS.get(this.eip1559Config.network)
+      this.log(
+        chalk`
+        Launching {green Hyperlegder Besu} for you.
+        Your node should appear soon on the network status page.
+        Opening {magenta ${ethStatsURL}} in your default browser.
+        `,
+      )
+      await open(ethStatsURL)
       shell.exec(`${besuBinPath} --config-file=${configTemplates.configLocalPath}`)
     }
   }

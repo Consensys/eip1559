@@ -18,6 +18,10 @@ export const StaticNodes = new Map<string, string[]>([
   ]],
 ])
 
+export const EthStatsURLS = new Map<string, string>([
+  [Network.RHODES, 'http://3.21.227.120:3001/'],
+])
+
 export class EthStatsCredentials {
   private readonly _endpoint: string
 
