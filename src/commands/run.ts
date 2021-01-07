@@ -192,8 +192,6 @@ export default class Run extends Command {
   async installBesu(): Promise<string> {
     this.log('Installing Besu')
     const cfg = await InstallBesu.installBesu()
-    await cli.wait(5000)
-    shell.chmod('+x', cfg.besuBinPath)
     return cfg.besuBinPath
   }
 }

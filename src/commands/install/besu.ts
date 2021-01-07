@@ -1,9 +1,12 @@
 import {Command, flags} from '@oclif/command'
 import * as os from 'os'
 import * as fs from 'fs'
+import cli from 'cli-ux'
 const download = require('download')
 const rimraf = require('rimraf')
 const unzipper = require('unzipper')
+const shell = require('shelljs')
+const chalk = require('chalk')
 
 class BesuInstallConfiguration {
   static readonly rootDownloadURL = 'https://dl.bintray.com/hyperledger-org/besu-repo'
@@ -62,12 +65,15 @@ export default class InstallBesu extends Command {
 
   async run() {
     const osType = os.type()
-    this.log('Detected os type: ' + osType)
+    this.log('Detected os type: ' + chalk.green(osType))
     const {flags} = this.parse(InstallBesu)
 
     const cfg = new BesuInstallConfiguration(flags.version, flags.path)
     await InstallBesu.downloadBesuArchive(cfg)
     await InstallBesu.extractArchive(cfg)
+    await cli.wait(5000)
+    shell.chmod('+x', cfg.besuBinPath)
+    this.log('Besu has been installed to: ', chalk.yellow(cfg.besuBinPath))
   }
 
   static async  downloadBesuArchive(cfg: BesuInstallConfiguration): Promise<void> {
@@ -91,6 +97,8 @@ export default class InstallBesu extends Command {
     )
     await InstallBesu.downloadBesuArchive(cfg)
     await InstallBesu.extractArchive(cfg)
+    await cli.wait(5000)
+    shell.chmod('+x', cfg.besuBinPath)
     return cfg
   }
 }
