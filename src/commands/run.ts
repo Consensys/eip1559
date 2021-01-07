@@ -172,6 +172,8 @@ export default class Run extends Command {
       chalk`
       Configuration files are ready. You can now run:
       {green ${besuBinPath}} --config-file={yellow ${configTemplates.configLocalPath}}
+      Or if you want to run it in a background process:
+      {green ${besuBinPath}} --config-file={yellow ${configTemplates.configLocalPath}} >> {blue ${configTemplates.logFilePath}} 2>&1
       `,
     )
     const runNow = await cli.prompt('Do you want to run it now? Y/n', {required: false}) as string
@@ -184,7 +186,7 @@ export default class Run extends Command {
         Opening {magenta ${ethStatsURL}} in your default browser.
         `,
       )
-      await open(ethStatsURL)
+      open(ethStatsURL)
       shell.exec(`${besuBinPath} --config-file=${configTemplates.configLocalPath}`)
     }
   }

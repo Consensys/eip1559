@@ -118,6 +118,8 @@ export class ConfigTemplates {
 
   private readonly _staticNodesPath: string
 
+  private readonly _logFilePath: string
+
   constructor(genesisURL: string, configURL: string, workDir: string, client: string) {
     this._genesisURL = genesisURL
     this._configURL = configURL
@@ -127,6 +129,7 @@ export class ConfigTemplates {
     this._configLocalTemplatePath = `${workDir}/config/${client}/config.toml.template`
     this._configLocalPath = `${workDir}/config/${client}/config.toml`
     this._staticNodesPath = `${workDir}/config/${client}/data/static-nodes.json`
+    this._logFilePath = `${workDir}/config/${client}/besu.log`
   }
 
   get genesisURL(): string {
@@ -159,5 +162,9 @@ export class ConfigTemplates {
 
   get staticNodesPath(): string {
     return this._staticNodesPath
+  }
+
+  get logFilePath(): string {
+    return this._logFilePath
   }
 }
