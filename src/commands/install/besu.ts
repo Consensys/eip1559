@@ -20,11 +20,14 @@ class BesuInstallConfiguration {
 
   private readonly _archiveLocalPath: string
 
+  private readonly _besuBinPath: string
+
   constructor(version: string, installRootPath: string) {
     this._version = version
     this._installRootPath = installRootPath
     this._archiveURL = `${BesuInstallConfiguration.rootDownloadURL}/besu-${version}.zip`
     this._archiveLocalPath = `${this._installRootPath}/besu-${version}.zip`
+    this._besuBinPath = `${installRootPath}/besu-${version}/bin/besu`
   }
 
   get version(): string {
@@ -41,6 +44,10 @@ class BesuInstallConfiguration {
 
   get archiveLocalPath(): string {
     return this._archiveLocalPath
+  }
+
+  get besuBinPath(): string {
+    return this._besuBinPath
   }
 }
 
@@ -59,11 +66,11 @@ export default class InstallBesu extends Command {
     const {flags} = this.parse(InstallBesu)
 
     const cfg = new BesuInstallConfiguration(flags.version, flags.path)
-    await this.downloadBesuArchive(cfg)
-    await this.extractArchive(cfg)
+    await InstallBesu.downloadBesuArchive(cfg)
+    await InstallBesu.extractArchive(cfg)
   }
 
-  async downloadBesuArchive(cfg: BesuInstallConfiguration): Promise<void> {
+  static async  downloadBesuArchive(cfg: BesuInstallConfiguration): Promise<void> {
     if (fs.existsSync(cfg.installRootPath)) {
       rimraf.sync(cfg.installRootPath)
     }
@@ -71,9 +78,19 @@ export default class InstallBesu extends Command {
     fs.writeFileSync(cfg.archiveLocalPath, await download(cfg.archiveURL))
   }
 
-  async extractArchive(cfg: BesuInstallConfiguration): Promise<void> {
+  static async extractArchive(cfg: BesuInstallConfiguration): Promise<void> {
     fs.createReadStream(cfg.archiveLocalPath)
     // eslint-disable-next-line new-cap
     .pipe(unzipper.Extract({path: cfg.installRootPath}))
+  }
+
+  public static async installBesu(): Promise<BesuInstallConfiguration> {
+    const cfg = new BesuInstallConfiguration(
+      BesuInstallConfiguration.defaultBesuVersion,
+      BesuInstallConfiguration.defaultBesuLocation
+    )
+    await InstallBesu.downloadBesuArchive(cfg)
+    await InstallBesu.extractArchive(cfg)
+    return cfg
   }
 }

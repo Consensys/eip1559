@@ -12,6 +12,7 @@ import {
 import Errors from '../errors'
 import * as fs from 'fs'
 import cli from 'cli-ux'
+import InstallBesu from './install/besu'
 
 const logSymbols = require('log-symbols')
 const ejs = require('ejs')
@@ -158,15 +159,23 @@ export default class Run extends Command {
   }
 
   async printBesuRunCommand(configTemplates: ConfigTemplates): Promise<void> {
+    let besuBinPath = 'besu'
+    if (!shell.which('besu')) {
+      this.log('Besu is not installed on your machine.')
+      const installBesuNow = await cli.prompt('Do you want to install it now? Y/n', {required: false}) as string
+      if (installBesuNow === '' || installBesuNow === 'y'  || installBesuNow === 'Y' || installBesuNow === 'yes' || installBesuNow === 'YES') {
+        besuBinPath = await this.installBesu()
+      }
+    }
     this.log(
       chalk`
       Configuration files are ready. You can now run:
-      {green besu} --config-file={yellow ${configTemplates.configLocalPath}}
+      {green ${besuBinPath}} --config-file={yellow ${configTemplates.configLocalPath}}
       `,
     )
     const runNow = await cli.prompt('Do you want to run it now? Y/n', {required: false}) as string
     if (runNow === '' || runNow === 'y'  || runNow === 'Y' || runNow === 'yes' || runNow === 'YES') {
-      shell.exec(`besu --config-file=${configTemplates.configLocalPath}`)
+      shell.exec(`${besuBinPath} --config-file=${configTemplates.configLocalPath}`)
     }
   }
 
@@ -178,5 +187,13 @@ export default class Run extends Command {
     }
     const credentials: EthStatsCredentials = ethStatsCredentials as EthStatsCredentials
     return `${name}:${credentials.password}@${credentials.endpoint}`
+  }
+
+  async installBesu(): Promise<string> {
+    this.log('Installing Besu')
+    const cfg = await InstallBesu.installBesu()
+    await cli.wait(5000)
+    shell.chmod('+x', cfg.besuBinPath)
+    return cfg.besuBinPath
   }
 }
