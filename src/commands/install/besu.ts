@@ -7,6 +7,7 @@ const rimraf = require('rimraf')
 const unzipper = require('unzipper')
 const shell = require('shelljs')
 const chalk = require('chalk')
+const cliProgress = require('cli-progress')
 
 class BesuInstallConfiguration {
   static readonly rootDownloadURL = 'https://dl.bintray.com/hyperledger-org/besu-repo'
@@ -91,14 +92,34 @@ export default class InstallBesu extends Command {
   }
 
   public static async installBesu(): Promise<BesuInstallConfiguration> {
+    const progressBar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic)
+    progressBar.start(100, 0)
     const cfg = new BesuInstallConfiguration(
       BesuInstallConfiguration.defaultBesuVersion,
       BesuInstallConfiguration.defaultBesuLocation
     )
     await InstallBesu.downloadBesuArchive(cfg)
+    InstallBesu.doProgress(progressBar, 0, 50)
     await InstallBesu.extractArchive(cfg)
-    await cli.wait(5000)
+    InstallBesu.doProgress(progressBar, 50, 70)
+    await cli.wait(2000)
+    InstallBesu.doProgress(progressBar, 70, 85)
     shell.chmod('+x', cfg.besuBinPath)
+    await cli.wait(3000)
+    InstallBesu.doProgress(progressBar, 85, 99)
+    progressBar.update(100)
+    progressBar.stop()
     return cfg
+  }
+
+  public static doProgress(progressBar: any,  from: number, to: number, delay = 20) {
+    let value = from
+    const timer = setInterval(function () {
+      value++
+      progressBar.update(value)
+      if (value >= to) {
+        clearInterval(timer)
+      }
+    }, delay)
   }
 }
