@@ -32,9 +32,26 @@ USAGE
 # Commands
 
 <!-- commands -->
+* [`eip1559 faucet [FILE]`](#eip1559-faucet-file)
 * [`eip1559 help [COMMAND]`](#eip1559-help-command)
 * [`eip1559 install:besu`](#eip1559-installbesu)
 * [`eip1559 run`](#eip1559-run)
+
+## `eip1559 faucet [FILE]`
+
+describe the command here
+
+```
+USAGE
+  $ eip1559 faucet [FILE]
+
+OPTIONS
+  -f, --force
+  -h, --help       show CLI help
+  -n, --name=name  name to print
+```
+
+_See code: [src/commands/faucet.ts](https://github.com/abdelhamidbakhta/eip1559/blob/v1.0.3/src/commands/faucet.ts)_
 
 ## `eip1559 help [COMMAND]`
 
