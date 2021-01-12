@@ -21,7 +21,7 @@ $ npm install -g eip1559
 $ eip1559 COMMAND
 running command...
 $ eip1559 (-v|--version|version)
-eip1559/1.0.3 darwin-x64 node-v15.3.0
+eip1559/1.0.4 darwin-x64 node-v15.3.0
 $ eip1559 --help [COMMAND]
 USAGE
   $ eip1559 COMMAND
@@ -32,26 +32,25 @@ USAGE
 # Commands
 
 <!-- commands -->
-* [`eip1559 faucet [FILE]`](#eip1559-faucet-file)
+* [`eip1559 faucet ADDRESS`](#eip1559-faucet-address)
 * [`eip1559 help [COMMAND]`](#eip1559-help-command)
 * [`eip1559 install:besu`](#eip1559-installbesu)
 * [`eip1559 run`](#eip1559-run)
 
-## `eip1559 faucet [FILE]`
+## `eip1559 faucet ADDRESS`
 
-describe the command here
+EIP-1559 Testnet Faucet
 
 ```
 USAGE
-  $ eip1559 faucet [FILE]
+  $ eip1559 faucet ADDRESS
 
 OPTIONS
-  -f, --force
-  -h, --help       show CLI help
-  -n, --name=name  name to print
+  -h, --help             show CLI help
+  -n, --network=network  [default: RHODES] network to use
 ```
 
-_See code: [src/commands/faucet.ts](https://github.com/abdelhamidbakhta/eip1559/blob/v1.0.3/src/commands/faucet.ts)_
+_See code: [src/commands/faucet.ts](https://github.com/abdelhamidbakhta/eip1559/blob/v1.0.4/src/commands/faucet.ts)_
 
 ## `eip1559 help [COMMAND]`
 
@@ -84,7 +83,7 @@ OPTIONS
   -v, --version=version  [default: 20.10.3] version of Besu to install
 ```
 
-_See code: [src/commands/install/besu.ts](https://github.com/abdelhamidbakhta/eip1559/blob/v1.0.3/src/commands/install/besu.ts)_
+_See code: [src/commands/install/besu.ts](https://github.com/abdelhamidbakhta/eip1559/blob/v1.0.4/src/commands/install/besu.ts)_
 
 ## `eip1559 run`
 
@@ -103,5 +102,5 @@ OPTIONS
   -w, --workDir=workDir  [default: /Users/abdelhamid/.eip1559] working directory
 ```
 
-_See code: [src/commands/run.ts](https://github.com/abdelhamidbakhta/eip1559/blob/v1.0.3/src/commands/run.ts)_
+_See code: [src/commands/run.ts](https://github.com/abdelhamidbakhta/eip1559/blob/v1.0.4/src/commands/run.ts)_
 <!-- commandsstop -->
