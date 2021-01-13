@@ -192,7 +192,11 @@ export default class Run extends Command {
   }
 
   async generateEthStatsURL(): Promise<string> {
-    const name = `${this.eip1559Config.network.toLowerCase()}-${this.eip1559Config.client.toLowerCase()}-${new Date().getTime()}`
+    let name = `${this.eip1559Config.network.toLowerCase()}-${this.eip1559Config.client.toLowerCase()}-${new Date().getTime()}`
+    const ethStatsNodeName = await cli.prompt(`What is the name of your node? default will be (${chalk.green(name)})`, {required: false}) as string
+    if (ethStatsNodeName !== '') {
+      name = ethStatsNodeName
+    }
     const ethStatsCredentials: EthStatsCredentials|undefined = EthStatsData.get(this.eip1559Config.network)
     if (ethStatsCredentials === undefined) {
       return Promise.reject(new Error('cannot retrieve ethstats credentials for specified network'))
