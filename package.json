@@ -1,7 +1,7 @@
 {
   "name": "eip1559",
   "description": "EIP-1559 command line tools",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "author": "Abdelhamid Bakhta @abdelhamidbakhta",
   "bin": {
     "eip1559": "bin/run"

@@ -14,7 +14,7 @@ class BesuInstallConfiguration {
 
   static readonly defaultBesuLocation = `${require('os').homedir()}/.eip1559/install/besu`
 
-  static readonly defaultBesuVersion = '20.10.3'
+  static readonly defaultBesuVersion = '21.2.0-SNAPSHOT'
 
   private readonly _version: string
 
@@ -29,7 +29,8 @@ class BesuInstallConfiguration {
   constructor(version: string, installRootPath: string) {
     this._version = version
     this._installRootPath = installRootPath
-    this._archiveURL = `${BesuInstallConfiguration.rootDownloadURL}/besu-${version}.zip`
+    // this._archiveURL = `${BesuInstallConfiguration.rootDownloadURL}/besu-${version}.zip`
+    this._archiveURL = 'https://34168-206414745-gh.circle-artifacts.com/0/distributions/besu-21.2.0-SNAPSHOT.zip'
     this._archiveLocalPath = `${this._installRootPath}/besu-${version}.zip`
     this._besuBinPath = `${installRootPath}/besu-${version}/bin/besu`
   }
